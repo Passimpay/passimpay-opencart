@@ -1,29 +1,41 @@
 <?php
 // Heading
-$_['heading_title'] = 'Passimpay';
+$_['heading_title']    = 'Passimpay';
 
 // Text
-$_['text_edit'] = 'Редактирование модуля';
-$_['text_payment'] = 'Оплата';
-$_['text_passimpay'] = '<a href="https://passimpay.io/" target="_blank"><img width="100" height="31" src="view/image/payment/passim_logo_en.svg" alt="Passimpay" title="Passimpay" style="border: 1px solid #EEEEEE;" /></a>';
-$_['text_success'] = 'Настройки модуля обновлены!';   
-$_['text_pay'] = 'Passimpay';
-$_['text_response_description'] = 'Текст ошибки:';
-$_['text_enot_order_status'] = 'Статус заказа:';
-$_['text_response_code'] = 'Код ошибки:';
+$_['text_home']        = 'Главная';
+$_['text_extension']   = 'Расширения';
+$_['text_all_zones']   = 'Все зоны';
+$_['text_success']     = 'Настройки модуля Passimpay обновлены.';
+$_['text_edit']        = 'Редактировать Passimpay';
+$_['text_enabled']     = 'Включено';
+$_['text_disabled']    = 'Выключено';
 
 // Entry
-$_['entry_merchant_id'] = 'Shop ID:';
-$_['entry_apikey'] = 'ApiKey:';
-$_['entry_title'] = 'Заголовок:';
+$_['entry_api_key']    = 'API ключ (Secret Key)';
+$_['entry_platform_id'] = 'Platform ID';
+$_['entry_payment_type'] = 'Способ оплаты';
+$_['entry_payment_type_both']   = 'Карта и криптовалюта';
+$_['entry_payment_type_crypto'] = 'Только криптовалюта';
+$_['entry_payment_type_card']   = 'Только банковская карта';
+$_['entry_card_notice'] = 'Перед включением оплаты картой убедитесь, что в настройках платформы в Passimpay включён переключатель «Карты/банковский перевод».';
+$_['entry_order_status_success_id'] = 'Статус заказа (оплачен)';
+$_['entry_order_status_pending_id'] = 'Статус заказа (ожидание)';
+$_['entry_order_status_failed_id']   = 'Статус заказа (ошибка/отмена)';
+$_['entry_status']     = 'Статус';
+$_['entry_sort_order'] = 'Порядок сортировки';
+$_['entry_geo_zone']   = 'Геозона';
+$_['entry_callback_url'] = 'URL для уведомлений (callback)';
+$_['entry_return_url'] = 'URL возврата';
 
-$_['entry_order_status'] = 'Статус заказа после оплаты:';
+// Tab
+$_['tab_general']      = 'Основное';
 
-$_['entry_status'] = 'Статус:';
-$_['entry_sort_order'] = 'Порядок сортировки:';
+// Button
+$_['button_save']      = 'Сохранить';
+$_['button_cancel']    = 'Отмена';
 
 // Error
-$_['error_permission'] = 'У Вас нет прав для управления этим модулем!';
-$_['error_merchant_id'] = 'ID магазина не заполнен!';
-$_['error_apikey'] = 'ApiKey не заполнен!';
-?>
+$_['error_permission'] = 'Недостаточно прав для изменения модуля Passimpay.';
+$_['error_api_key']    = 'Укажите API ключ';
+$_['error_platform_id'] = 'Укажите Platform ID';
