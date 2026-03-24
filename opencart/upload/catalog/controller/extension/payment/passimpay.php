@@ -1,133 +1,167 @@
 <?php
+/**
+ * Passimpay payment method - Catalog (redirect, callback, return)
+ */
+class ControllerExtensionPaymentPassimpay extends Controller {
+    private const API_URL = 'https://api.passimpay.io';
 
-class ControllerExtensionPaymentPassimpay extends Controller
-{
-
-    public function index()
-    {
-        $this->language->load('extension/payment/passimpay');
-        $order_id = $this->session->data['order_id'];
-        $this->load->model('checkout/order');
-        $order_info = $this->model_checkout_order->getOrder($this->session->data['order_id']);
-
-        $platform_id = $this->config->get('payment_passimpay_merchant_id');
-        $apikey = $this->config->get('payment_passimpay_apikey');
-        $amount = number_format($order_info['total'], 2, '.', '');
-        //$desc = $this->language->get('order_description') . $order_id;
-
-        $this->load->model('localisation/currency');
-
-        $currency_info = $this->model_localisation_currency->getCurrencies();
-
-        if ($this->config->get('config_currency') !== 'USD'){
-            $amount = number_format( round($amount * $currency_info['USD']['value']), 2, '.', '' );
-        }
-
-        $payload = http_build_query(['platform_id' => $platform_id, 'order_id' => $order_id, 'amount' => $amount]);
-        $hash = hash_hmac('sha256', $payload, $apikey);
-
-        $data = [
-            'platform_id' => $platform_id,
-            'order_id' => $order_id,
-            'amount' => $amount,
-            'hash' => $hash
-        ];
-
-        $post_data = http_build_query($data);
-
-        $curl = curl_init();
-        curl_setopt($curl, CURLOPT_HEADER, false);
-        curl_setopt($curl, CURLOPT_HTTPHEADER, ['Content-Type: application/x-www-form-urlencoded']);
-        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($curl, CURLOPT_POSTFIELDS, $post_data);
-        curl_setopt($curl, CURLOPT_URL, 'https://api.passimpay.io/createorder');
-        curl_setopt($curl, CURLOPT_POST, true);
-        curl_setopt($curl, CURLOPT_ENCODING, 'gzip');
-        curl_setopt($curl, CURLOPT_FOLLOWLOCATION, true);
-        //curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
-        //curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, false);
-        $result = curl_exec($curl);
-        curl_close($curl);
-
-        $result = json_decode($result, true);
-
-        // Варианты ответов
-        // В случае успеха
-        if (isset($result['result']) && $result['result'] == 1) {
-            $url = $result['url'];
-            $data['url'] = $url;
-        } // В случае ошибки
-        else {
-            $error = $result['message']; // Текст ошибки
-            $data['error'] = $error;
-        }
-
-        $this->load->model('checkout/order');
-        if (file_exists(DIR_TEMPLATE . $this->config->get('config_template') . '/template/extension/payment/passimpay')) {
-            return $this->load->view($this->config->get('config_template') . '/template/extension/payment/passimpay', $data);
-        } else {
-            return $this->load->view('/extension/payment/passimpay', $data);
-        }
+    /**
+     * Some themes submit the confirm form to this action. Redirect to index (createorder + redirect).
+     */
+    public function confirm() {
+        $this->response->redirect($this->url->link('extension/payment/passimpay', '', true));
     }
 
-    public function success(){
-        $this->cart->clear();
-        $this->response->redirect($this->url->link('checkout/success', '', true));
-    }
-
-    public function fail(){
-        $this->response->redirect($this->url->link('checkout/confirm', '', true));
-    }
-
-    public function notify(){
-
-        $apikey = $this->config->get('payment_passimpay_apikey');
-
-        $hash = $_POST['hash'];
-
-        $data = [
-            'platform_id' => (int) $_POST['platform_id'], // ID платформы
-            'payment_id' => (int) $_POST['payment_id'], // ID валюты
-            'order_id' => (int) $_POST['order_id'], // Payment ID Вашей платформы
-            'amount' => $_POST['amount'], // сумма транзакции
-            'txhash' => $_POST['txhash'], // Хэш или ID транзакции. ID транзакции можно найти в истории транзакций PassimPay в Вашем аккаунте.
-            'address_from' => $_POST['address_from'], // адрес отправителя
-            'address_to' => $_POST['address_to'], // адрес получателя
-            'fee' => $_POST['fee'], // комиссия сети
-        ];
-
-        if (isset($_POST['confirmations']))
-        {
-            $data['confirmations'] = $_POST['confirmations']; // количество подтверждений сети (Bitcoin, Litecoin, Dogecoin, Bitcoin Cash)
-        }
-
-        $payload = http_build_query($data);
-
-        if (!isset($hash) || hash_hmac('sha256', $payload, $apikey) != $hash)
-        {
-            return false;
-        }
-
-        // платеж зачислен
-        // ваш код...
-
-        $order_id = isset($this->request->post['order_id'])
-            ? (int)$this->request->post['order_id']
-            : 0;
-
+    /**
+     * Called after order is created. Creates Passimpay order and redirects to payment page.
+     */
+    public function index() {
+        $this->load->language('extension/payment/passimpay');
+        $order_id = isset($this->session->data['order_id']) ? (int) $this->session->data['order_id'] : 0;
         if (!$order_id) {
-            exit;
+            $this->response->redirect($this->url->link('checkout/checkout', '', true));
+            return;
         }
-
         $this->load->model('checkout/order');
         $order_info = $this->model_checkout_order->getOrder($order_id);
-        $amount = number_format($order_info['total'], 2, '.', '');
-        $comment = 'Passimpay Transaction id: ' . $_POST['txhash'];
-
-        $this->log->write('Passimpay: ' . $order_id . ' - ' . $order_id . ' - ' . 'Transaction completed.' . ' Transaction id: ' . $_POST['txhash']);
-
-        $this->model_checkout_order->addOrderHistory($order_id, $this->config->get('payment_passimpay_order_status_id'), $comment, $notify = true, $override = false);
-
+        if (!$order_info) {
+            $this->response->redirect($this->url->link('checkout/checkout', '', true));
+            return;
+        }
+        $api_key = $this->config->get('payment_passimpay_api_key');
+        $platform_id = (int) $this->config->get('payment_passimpay_platform_id');
+        if (empty($api_key) || !$platform_id) {
+            $this->log->write('Passimpay: API Key or Platform ID not set');
+            $this->response->redirect($this->url->link('checkout/failure', '', true));
+            return;
+        }
+        $amount = $this->currency->format($order_info['total'], $order_info['currency_code'], $order_info['currency_value'], false);
+        $amount = number_format((float) $amount, 2, '.', '');
+        $currency = strtoupper($order_info['currency_code']);
+        $payment_type = (int) $this->config->get('payment_passimpay_payment_type');
+        $body = [
+            'platformId' => $platform_id,
+            'orderId'    => (string) $order_id,
+            'amount'     => $amount,
+            'symbol'     => $currency,
+            'type'       => $payment_type,
+        ];
+        $json_body = json_encode($body, JSON_UNESCAPED_SLASHES);
+        $signature_string = $platform_id . ';' . $json_body . ';' . $api_key;
+        $signature = hash_hmac('sha256', $signature_string, $api_key);
+        $ch = curl_init(self::API_URL . '/v2/createorder');
+        curl_setopt_array($ch, [
+            CURLOPT_POST           => true,
+            CURLOPT_POSTFIELDS     => $json_body,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_HTTPHEADER     => [
+                'Content-Type: application/json',
+                'x-signature: ' . $signature,
+            ],
+            CURLOPT_SSL_VERIFYPEER => true,
+            CURLOPT_TIMEOUT        => 30,
+        ]);
+        $response = curl_exec($ch);
+        $err = curl_error($ch);
+        curl_close($ch);
+        if ($err) {
+            $this->log->write('Passimpay createorder CURL error: ' . $err);
+            $this->response->redirect($this->url->link('checkout/failure', '', true));
+            return;
+        }
+        $result = json_decode($response, true);
+        if (!empty($result['result']) && (int) $result['result'] === 1 && !empty($result['url'])) {
+            $this->response->redirect($result['url']);
+            return;
+        }
+        $msg = isset($result['message']) ? $result['message'] : 'Unknown error';
+        $this->log->write('Passimpay createorder failed: ' . $msg);
+        $this->response->redirect($this->url->link('checkout/failure', '', true));
     }
 
+    /**
+     * Server callback (IPN) from Passimpay. Check order status and update.
+     */
+    public function callback() {
+        $order_id = 0;
+        if (!empty($this->request->get['order_id'])) {
+            $order_id = (int) $this->request->get['order_id'];
+        } elseif (!empty($this->request->post['order_id'])) {
+            $order_id = (int) $this->request->post['order_id'];
+        } elseif (!empty($this->request->post['orderId'])) {
+            $order_id = (int) $this->request->post['orderId'];
+        }
+        if (!$order_id) {
+            $this->response->addHeader('HTTP/1.1 400 Bad Request');
+            $this->response->setOutput('order_id required');
+            return;
+        }
+        $api_key = $this->config->get('payment_passimpay_api_key');
+        $platform_id = (int) $this->config->get('payment_passimpay_platform_id');
+        if (empty($api_key) || !$platform_id) {
+            $this->response->addHeader('HTTP/1.1 500 Internal Server Error');
+            return;
+        }
+        $body = [
+            'platformId' => $platform_id,
+            'orderId'    => (string) $order_id,
+        ];
+        $json_body = json_encode($body, JSON_UNESCAPED_SLASHES);
+        $signature_string = $platform_id . ';' . $json_body . ';' . $api_key;
+        $signature = hash_hmac('sha256', $signature_string, $api_key);
+        $ch = curl_init(self::API_URL . '/v2/orderstatus');
+        curl_setopt_array($ch, [
+            CURLOPT_POST           => true,
+            CURLOPT_POSTFIELDS     => $json_body,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_HTTPHEADER     => [
+                'Content-Type: application/json',
+                'x-signature: ' . $signature,
+            ],
+            CURLOPT_SSL_VERIFYPEER => true,
+            CURLOPT_TIMEOUT        => 30,
+        ]);
+        $response = curl_exec($ch);
+        curl_close($ch);
+        $result = json_decode($response, true);
+        if (empty($result['result']) || (int) $result['result'] !== 1) {
+            $this->response->addHeader('HTTP/1.1 200 OK');
+            $this->response->setOutput('ok');
+            return;
+        }
+        $status = isset($result['status']) ? $result['status'] : '';
+        $this->load->model('checkout/order');
+        $order_info = $this->model_checkout_order->getOrder($order_id);
+        if (!$order_info) {
+            $this->response->addHeader('HTTP/1.1 200 OK');
+            $this->response->setOutput('ok');
+            return;
+        }
+        $pending_id = (int) $this->config->get('payment_passimpay_order_status_pending_id');
+        $success_id = (int) $this->config->get('payment_passimpay_order_status_success_id');
+        $failed_id = (int) $this->config->get('payment_passimpay_order_status_failed_id');
+        if ($status === 'paid') {
+            $this->model_checkout_order->addOrderHistory($order_id, $success_id, 'Passimpay: payment completed', false);
+        } elseif ($status === 'error') {
+            $this->model_checkout_order->addOrderHistory($order_id, $failed_id, 'Passimpay: payment failed', false);
+        } else {
+            if ($pending_id) {
+                $this->model_checkout_order->addOrderHistory($order_id, $pending_id, 'Passimpay: pending', false);
+            }
+        }
+        $this->response->addHeader('HTTP/1.1 200 OK');
+        $this->response->setOutput('ok');
+    }
+
+    /**
+     * Return URL - customer comes back from Passimpay. Redirect to success.
+     */
+    public function return() {
+        $order_id = isset($this->session->data['order_id']) ? (int) $this->session->data['order_id'] : 0;
+        if ($order_id) {
+            $this->response->redirect($this->url->link('checkout/success', '', true));
+        } else {
+            $this->response->redirect($this->url->link('common/home', '', true));
+        }
+    }
 }
