@@ -1,105 +1,143 @@
 {{ header }}{{ column_left }}
 <div id="content">
-	<div class="page-header">
-		<div class="container-fluid">
-			<div class="pull-right">
-				<button type="submit" form="form" data-toggle="tooltip" title="{{ button_save }}" class="btn btn-primary"><i class="fa fa-save"></i></button>
-				<a href="{{ cancel }}" data-toggle="tooltip" title="{{ button_cancel }}" class="btn btn-default"><i class="fa fa-reply"></i></a>
-			</div>
-			<img width="100" height="31" src="view/image/payment/passim_logo_en.svg" alt="{{ heading_title }}">
-			<ul class="breadcrumb">
-				{% for breadcrumb in breadcrumbs %}
-				<li><a href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a></li>
-				{% endfor %}
-			</ul>
-		</div>
-	</div>
-	<div class="container-fluid">
-		<div class="panel panel-default">
-			<div class="panel-heading">
-				<h3 class="panel-title"><i class="fa fa-pencil"></i>{{ text_edit }}</h3>
-			</div>
-			<div class="panel-body">
-				<form action="{{ action }}" method="post" enctype="multipart/form-data" id="form" class="form-horizontal">
-					
-					<div class="panel-body">
-						<div class="col-sm-2" style="text-align: right;margin-left: -15px;margin-right: -15px;"><b> </b></div>
-						<div class="col-sm-10" style="padding-left: 25px;">
-							<a href="https://passimpay.io/register" target="_blank" rel="noopener noreferrer">Register a website in the payment system PASSIMPAY >>></a>
-							
-						</div>
-					</div>
-					
-
-				
-					<div class="form-group required{% if error_apikey %} has-error{% endif %}">
-						<label class="col-sm-2 control-label">{{ entry_apikey }}</label>
-						<div class="col-sm-10">
-							<input type="text" name="payment_passimpay_apikey" value="{{ payment_passimpay_apikey }}" class="form-control">
-							{% if error_apikey %}
-							<div class="text-danger">{{ error_apikey }}</div>
-							{% endif %}
-						</div>
-					</div>
-					<div class="form-group required{% if error_merchant_id %} has-error{% endif %}">
-						<label class="col-sm-2 control-label">{{ entry_merchant_id }}</label>
-						<div class="col-sm-10">
-							<input type="text" name="payment_passimpay_merchant_id" value="{{ payment_passimpay_merchant_id }}" class="form-control">
-							{% if error_merchant_id %}
-							<div class="text-danger">{{ error_merchant_id }}</div>
-							{% endif %}
-						</div>
-					</div>
-					
-				
-					
-					<div class="form-group">
-						<label class="col-sm-2 control-label">{{ entry_title }}</label>
-						<div class="col-sm-10">
-							<input type="text" name="payment_passimpay_title" value="{{ payment_passimpay_title }}" placeholder="{{ heading_title }}" class="form-control">
-						</div>
-					</div>
-					
-					<div class="form-group">
-						<label class="col-sm-2 control-label">{{ entry_order_status }}</label>
-						<div class="col-sm-10">
-							<select name="payment_passimpay_order_status_id" class="form-control">
-								{% for order_status in order_statuses %}
-								{% if order_status.order_status_id == payment_passimpay_order_status_id %}
-								<option value="{{ order_status.order_status_id }}"
-								selected="selected">{{ order_status.name }}</option>
-								{% else %}
-								<option value="{{ order_status.order_status_id }}">{{ order_status.name }}</option>
-								{% endif %}
-								{% endfor %}
-							</select>
-						</div>
-					</div>
-					
-					<div class="form-group">
-						<label class="col-sm-2 control-label">{{ entry_status }}</label>
-						<div class="col-sm-10">
-							<select name="payment_passimpay_status" class="form-control">
-								{% if payment_passimpay_status %}
-								<option value="1" selected="selected">{{ text_enabled }}</option>
-								<option value="0">{{ text_disabled }}</option>
-								{% else %}
-								<option value="1">{{ text_enabled }}</option>
-								<option value="0" selected="selected">{{ text_disabled }}</option>
-								{% endif %}
-							</select>
-						</div>
-					</div>
-					
-					<div class="form-group">
-						<label class="col-sm-2 control-label">{{ entry_sort_order }}</label>
-						<div class="col-sm-10">
-							<input type="text" name="payment_passimpay_sort_order" value="{{ payment_passimpay_sort_order }}" class="form-control">
-						</div>
-					</div>
-				</form>
-			</div>
-		</div>
-	</div>
+  <div class="page-header">
+    <div class="container-fluid">
+      <div class="pull-right">
+        <button type="submit" form="form-passimpay" data-toggle="tooltip" title="{{ button_save }}" class="btn btn-primary"><i class="fa fa-save"></i></button>
+        <a href="{{ cancel }}" data-toggle="tooltip" title="{{ button_cancel }}" class="btn btn-default"><i class="fa fa-reply"></i></a>
+      </div>
+      <h1>{{ heading_title }}</h1>
+      <ul class="breadcrumb">
+        {% for breadcrumb in breadcrumbs %}
+        <li><a href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a></li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+  <div class="container-fluid">
+    {% if error_warning %}
+    <div class="alert alert-danger"><i class="fa fa-exclamation-circle"></i> {{ error_warning }}</div>
+    {% endif %}
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h3 class="panel-title"><i class="fa fa-pencil"></i> {{ text_edit }}</h3>
+      </div>
+      <div class="panel-body">
+        <form action="{{ action }}" method="post" enctype="multipart/form-data" id="form-passimpay" class="form-horizontal">
+          <div class="form-group required">
+            <label class="col-sm-2 control-label" for="input-api-key">{{ entry_api_key }}</label>
+            <div class="col-sm-10">
+              <input type="text" name="payment_passimpay_api_key" value="{{ payment_passimpay_api_key }}" placeholder="{{ entry_api_key }}" id="input-api-key" class="form-control" />
+              {% if error_api_key %}
+              <div class="text-danger">{{ error_api_key }}</div>
+              {% endif %}
+            </div>
+          </div>
+          <div class="form-group required">
+            <label class="col-sm-2 control-label" for="input-platform-id">{{ entry_platform_id }}</label>
+            <div class="col-sm-10">
+              <input type="text" name="payment_passimpay_platform_id" value="{{ payment_passimpay_platform_id }}" placeholder="{{ entry_platform_id }}" id="input-platform-id" class="form-control" />
+              {% if error_platform_id %}
+              <div class="text-danger">{{ error_platform_id }}</div>
+              {% endif %}
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-sm-2 control-label" for="input-payment-type">{{ entry_payment_type }}</label>
+            <div class="col-sm-10">
+              <select name="payment_passimpay_payment_type" id="input-payment-type" class="form-control">
+                <option value="0" {{ payment_passimpay_payment_type == 0 ? 'selected' : '' }}>{{ entry_payment_type_both }}</option>
+                <option value="1" {{ payment_passimpay_payment_type == 1 ? 'selected' : '' }}>{{ entry_payment_type_crypto }}</option>
+                <option value="2" {{ payment_passimpay_payment_type == 2 ? 'selected' : '' }}>{{ entry_payment_type_card }}</option>
+              </select>
+              <div id="passimpay-card-notice" class="alert alert-warning" style="margin-top:10px;{{ payment_passimpay_payment_type == 1 ? 'display:none;' : '' }}">
+                <i class="fa fa-info-circle"></i> {{ entry_card_notice }}
+              </div>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-sm-2 control-label">{{ entry_callback_url }}</label>
+            <div class="col-sm-10">
+              <code>{{ callback_url }}</code>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-sm-2 control-label">{{ entry_return_url }}</label>
+            <div class="col-sm-10">
+              <code>{{ return_url }}</code>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-sm-2 control-label" for="input-order-status-success">{{ entry_order_status_success }}</label>
+            <div class="col-sm-10">
+              <select name="payment_passimpay_order_status_success_id" id="input-order-status-success" class="form-control">
+                {% for order_status in order_statuses %}
+                <option value="{{ order_status.order_status_id }}" {{ order_status.order_status_id == payment_passimpay_order_status_success_id ? 'selected' : '' }}>{{ order_status.name }}</option>
+                {% endfor %}
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-sm-2 control-label" for="input-order-status-pending">{{ entry_order_status_pending }}</label>
+            <div class="col-sm-10">
+              <select name="payment_passimpay_order_status_pending_id" id="input-order-status-pending" class="form-control">
+                {% for order_status in order_statuses %}
+                <option value="{{ order_status.order_status_id }}" {{ order_status.order_status_id == payment_passimpay_order_status_pending_id ? 'selected' : '' }}>{{ order_status.name }}</option>
+                {% endfor %}
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-sm-2 control-label" for="input-order-status-failed">{{ entry_order_status_failed }}</label>
+            <div class="col-sm-10">
+              <select name="payment_passimpay_order_status_failed_id" id="input-order-status-failed" class="form-control">
+                {% for order_status in order_statuses %}
+                <option value="{{ order_status.order_status_id }}" {{ order_status.order_status_id == payment_passimpay_order_status_failed_id ? 'selected' : '' }}>{{ order_status.name }}</option>
+                {% endfor %}
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-sm-2 control-label" for="input-status">{{ entry_status }}</label>
+            <div class="col-sm-10">
+              <select name="payment_passimpay_status" id="input-status" class="form-control">
+                <option value="1" {{ payment_passimpay_status == 1 ? 'selected' : '' }}>{{ text_enabled }}</option>
+                <option value="0" {{ payment_passimpay_status == 0 ? 'selected' : '' }}>{{ text_disabled }}</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-sm-2 control-label" for="input-sort-order">{{ entry_sort_order }}</label>
+            <div class="col-sm-10">
+              <input type="text" name="payment_passimpay_sort_order" value="{{ payment_passimpay_sort_order }}" placeholder="{{ entry_sort_order }}" id="input-sort-order" class="form-control" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-sm-2 control-label" for="input-geo-zone">{{ entry_geo_zone }}</label>
+            <div class="col-sm-10">
+              <select name="payment_passimpay_geo_zone_id" id="input-geo-zone" class="form-control">
+                <option value="0">{{ text_all_zones }}</option>
+                {% for geo_zone in geo_zones %}
+                <option value="{{ geo_zone.geo_zone_id }}" {{ geo_zone.geo_zone_id == payment_passimpay_geo_zone_id ? 'selected' : '' }}>{{ geo_zone.name }}</option>
+                {% endfor %}
+              </select>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
 </div>
+<script type="text/javascript"><!--
+(function(){
+  var sel = document.getElementById('input-payment-type');
+  var notice = document.getElementById('passimpay-card-notice');
+  if (sel && notice) {
+    sel.addEventListener('change', function(){
+      var v = parseInt(this.value, 10);
+      notice.style.display = (v === 0 || v === 2) ? 'block' : 'none';
+    });
+  }
+})();
+//--></script>
 {{ footer }}
