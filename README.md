@@ -1,6 +1,6 @@
-# Passimpay для OpenCart 2.3 / ocStore 2.3
+# Passimpay для OpenCart 2.3
 
-Платёжный модуль Passimpay (карты и криптовалюты) для **ocStore / OpenCart 2.3.0.2.x**.
+Платёжный модуль Passimpay (карты и криптовалюты) для OpenCart 2.3.0.2.x**.
 
 ## Содержимое пакета
 
