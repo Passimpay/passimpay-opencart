@@ -1,17 +1,14 @@
-# Passimpay for OpenCart 2.3 / ocStore 2.3
+# Passimpay for OpenCart 2.3
 
-Passimpay payment module (cards and cryptocurrencies) for **ocStore / OpenCart 2.3.0.2.x**.
+Passimpay payment module (cards and cryptocurrencies) for OpenCart 2.3.0.2.x**.
 
 ## Package contents
 
-| File | Description |
-|---|---|
 | `INSTALL.en.md` | Detailed installation guide (recommended reading before installation) |
-| `source/` | Unpacked source files (for developers) |
 
 ## Quick start
 
-1. **Open `INSTALL.en.md`** and choose an installation method (via the OCMOD installer or manually via FTP).
+1. **Open `INSTALL.en.md`**.
 2. Install the plugin following the instructions.
 3. In the admin panel: **Extensions → Payment → Passimpay → Install → Edit**.
 4. Enter your **API Key** and **Platform ID** (from your Passimpay account).
