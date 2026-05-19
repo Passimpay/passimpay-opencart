@@ -1,8 +1,32 @@
-This **OpenCart** payment module is developed and powered by PassimPay.
+# Passimpay для OpenCart 2.3 / ocStore 2.3
 
-If you have any questions or face difficulties in module operation, please, contact us:
+Платёжный модуль Passimpay (карты и криптовалюты) для **ocStore / OpenCart 2.3.0.2.x**.
 
-* support@passimpay.io - PassimPay support service<br/>
-* ceo@passimpay.io - Assitance for Business 
+## Содержимое пакета
 
-Stay with PassimPay and grow your business!
+| Файл | Назначение |
+|---|---|
+
+| `INSTALL.md` | Подробная инструкция по установке (рекомендуется прочитать перед установкой) |
+| `source/` | Исходники в распакованном виде (для разработчиков) |
+
+## Быстрый старт
+
+1. **Откройте `INSTALL.md`** и выберите способ установки (через установщик OCMOD или вручную через FTP).
+2. Установите плагин по инструкции.
+3. В админке: **Дополнения → Способы оплаты → Passimpay → Установить → Редактировать**.
+4. Заполните **API Key** и **Platform ID** (из личного кабинета Passimpay).
+5. Скопируйте **URL для уведомлений (callback)** из формы настроек и пропишите его в личном кабинете Passimpay (Notification URL).
+6. Включите **Статус** → Сохранить.
+
+## Системные требования
+
+- ocStore 2.3.0.2.x (или совместимая сборка OpenCart 2.3)
+- PHP 5.6 или выше (тестировался от 5.6 до 8.x)
+- Расширения PHP: `curl`, `json`, `hash`
+- Исходящий доступ к `api.passimpay.io:443` (если на сервере есть firewall)
+- HTTPS на магазине
+
+## Поддержка
+
+При проблемах с установкой обратитесь в службу технической поддержки Passimpay.
