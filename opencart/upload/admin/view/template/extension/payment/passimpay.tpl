@@ -36,7 +36,7 @@
               <div class="form-group required">
                 <label class="col-sm-2 control-label" for="input-api-key"><?php echo $entry_api_key; ?></label>
                 <div class="col-sm-10">
-                  <input type="text" name="passimpay_api_key" value="<?php echo $passimpay_api_key; ?>" placeholder="<?php echo $entry_api_key; ?>" id="input-api-key" class="form-control" />
+                  <input type="password" name="passimpay_api_key" value="" autocomplete="new-password" placeholder="<?php echo $api_key_saved ? $text_api_key_saved : $entry_api_key; ?>" id="input-api-key" class="form-control" />
                   <?php if ($error_api_key) { ?><div class="text-danger"><?php echo $error_api_key; ?></div><?php } ?>
                 </div>
               </div>
@@ -58,6 +58,25 @@
                   <div id="passimpay-card-notice" class="alert alert-warning" style="margin-top:10px;<?php echo ($passimpay_payment_type == 1 ? 'display:none;' : ''); ?>">
                     <i class="fa fa-info-circle"></i> <?php echo $entry_card_notice; ?>
                   </div>
+                  <p class="help-block"><?php echo $text_card_method; ?></p>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="col-sm-2 control-label"><span data-toggle="tooltip" title="<?php echo $entry_title_help; ?>"><?php echo $entry_title; ?></span></label>
+                <div class="col-sm-10">
+                  <?php foreach ($languages as $language) { ?>
+                  <div class="input-group">
+                    <span class="input-group-addon"><img src="language/<?php echo $language['code']; ?>/<?php echo $language['code']; ?>.png" title="<?php echo $language['name']; ?>" /></span>
+                    <input type="text" name="passimpay_title[<?php echo $language['language_id']; ?>]" value="<?php echo isset($passimpay_title[$language['language_id']]) ? htmlspecialchars(html_entity_decode($passimpay_title[$language['language_id']], ENT_QUOTES, 'UTF-8'), ENT_QUOTES, 'UTF-8') : ''; ?>" placeholder="<?php echo $entry_title; ?>" class="form-control" />
+                  </div>
+                  <?php } ?>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="col-sm-2 control-label"><span data-toggle="tooltip" title="<?php echo $entry_logo_help; ?>"><?php echo $entry_logo; ?></span></label>
+                <div class="col-sm-10">
+                  <a href="" id="thumb-passimpay-logo" data-toggle="image" class="img-thumbnail"><img src="<?php echo $thumb; ?>" alt="" title="" data-placeholder="<?php echo $placeholder; ?>" /></a>
+                  <input type="hidden" name="passimpay_logo" value="<?php echo $passimpay_logo; ?>" id="input-passimpay-logo" />
                 </div>
               </div>
               <div class="form-group">
@@ -124,6 +143,13 @@
                   </select>
                 </div>
               </div>
+              <div class="form-group">
+                <label class="col-sm-2 control-label" for="input-allowed-ips"><span data-toggle="tooltip" title="<?php echo $entry_allowed_ips_help; ?>"><?php echo $entry_allowed_ips; ?></span></label>
+                <div class="col-sm-10">
+                  <textarea name="passimpay_allowed_ips" rows="3" placeholder="18.192.188.29" id="input-allowed-ips" class="form-control"><?php echo htmlspecialchars(html_entity_decode($passimpay_allowed_ips, ENT_QUOTES, 'UTF-8'), ENT_QUOTES, 'UTF-8'); ?></textarea>
+                  <?php if ($error_allowed_ips) { ?><div class="text-danger"><?php echo $error_allowed_ips; ?></div><?php } ?>
+                </div>
+              </div>
             </form>
           </div>
 
@@ -167,12 +193,28 @@
       type: 'GET',
       dataType: 'json',
       success: function(json){
-        $out.text(JSON.stringify(json, null, 2));
+        if (!json.url) {
+          $out.text(JSON.stringify(json, null, 2));
+          $btn.prop('disabled', false);
+          return;
+        }
+        $.ajax({
+          url: json.url,
+          type: 'GET',
+          dataType: 'json',
+          success: function(result){
+            $out.text(JSON.stringify(result, null, 2));
+          },
+          error: function(xhr){
+            $out.text('HTTP ' + xhr.status + ': ' + xhr.responseText);
+          },
+          complete: function(){
+            $btn.prop('disabled', false);
+          }
+        });
       },
       error: function(xhr){
         $out.text('HTTP ' + xhr.status + ': ' + xhr.responseText);
-      },
-      complete: function(){
         $btn.prop('disabled', false);
       }
     });
