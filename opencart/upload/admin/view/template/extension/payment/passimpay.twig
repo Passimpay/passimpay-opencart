@@ -27,7 +27,7 @@
           <div class="form-group required">
             <label class="col-sm-2 control-label" for="input-api-key">{{ entry_api_key }}</label>
             <div class="col-sm-10">
-              <input type="text" name="payment_passimpay_api_key" value="{{ payment_passimpay_api_key }}" placeholder="{{ entry_api_key }}" id="input-api-key" class="form-control" />
+              <input type="text" name="payment_passimpay_api_key" value="{{ payment_passimpay_api_key|escape('html_attr') }}" placeholder="{{ entry_api_key }}" id="input-api-key" class="form-control" />
               {% if error_api_key %}
               <div class="text-danger">{{ error_api_key }}</div>
               {% endif %}
@@ -36,7 +36,7 @@
           <div class="form-group required">
             <label class="col-sm-2 control-label" for="input-platform-id">{{ entry_platform_id }}</label>
             <div class="col-sm-10">
-              <input type="text" name="payment_passimpay_platform_id" value="{{ payment_passimpay_platform_id }}" placeholder="{{ entry_platform_id }}" id="input-platform-id" class="form-control" />
+              <input type="text" name="payment_passimpay_platform_id" value="{{ payment_passimpay_platform_id|escape('html_attr') }}" placeholder="{{ entry_platform_id }}" id="input-platform-id" class="form-control" />
               {% if error_platform_id %}
               <div class="text-danger">{{ error_platform_id }}</div>
               {% endif %}
@@ -58,13 +58,13 @@
           <div class="form-group">
             <label class="col-sm-2 control-label">{{ entry_callback_url }}</label>
             <div class="col-sm-10">
-              <code>{{ callback_url }}</code>
+              <code>{{ callback_url|escape('html') }}</code>
             </div>
           </div>
           <div class="form-group">
             <label class="col-sm-2 control-label">{{ entry_return_url }}</label>
             <div class="col-sm-10">
-              <code>{{ return_url }}</code>
+              <code>{{ return_url|escape('html') }}</code>
             </div>
           </div>
           <div class="form-group">

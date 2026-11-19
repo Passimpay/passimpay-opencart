@@ -5,6 +5,8 @@
  * @see https://passimpay.io/
  */
 class ControllerExtensionPaymentPassimpay extends Controller {
+    private $error = [];
+
     private const PAYMENT_TYPE_BOTH = 0;
     private const PAYMENT_TYPE_CRYPTO = 1;
     private const PAYMENT_TYPE_CARD = 2;
@@ -89,14 +91,9 @@ class ControllerExtensionPaymentPassimpay extends Controller {
         $this->load->model('localisation/geo_zone');
         $data['geo_zones'] = $this->model_localisation_geo_zone->getGeoZones();
 
-        $base = $this->config->get('config_url') ?? (HTTP_CATALOG ?? $this->request->server['HTTP_ORIGIN'] ?? '');
-        if (defined('HTTP_SERVER')) {
-            $base = rtrim(HTTP_SERVER, '/');
-        }
-        if (empty($base) && !empty($this->request->server['HTTP_HOST'])) {
-            $protocol = (!empty($this->request->server['HTTPS']) && $this->request->server['HTTPS'] !== 'off') ? 'https' : 'http';
-            $base = $protocol . '://' . $this->request->server['HTTP_HOST'] . rtrim(dirname($this->request->server['PHP_SELF']), '/.\\');
-        }
+        // В админке HTTP_SERVER указывает на admin; уведомления идут в каталог магазина.
+        $base = defined('HTTPS_CATALOG') && HTTPS_CATALOG ? HTTPS_CATALOG : HTTP_CATALOG;
+        $base = rtrim($base, '/');
         $data['callback_url'] = $base . '/index.php?route=extension/payment/passimpay/callback';
         $data['return_url'] = $base . '/index.php?route=extension/payment/passimpay/return';
 
@@ -112,11 +109,25 @@ class ControllerExtensionPaymentPassimpay extends Controller {
         if (!$this->user->hasPermission('modify', 'extension/payment/passimpay')) {
             $this->error['warning'] = $this->language->get('error_permission');
         }
-        if (empty($this->request->post['payment_passimpay_api_key'])) {
+        if (!isset($this->request->post['payment_passimpay_api_key']) || !is_string($this->request->post['payment_passimpay_api_key']) || trim($this->request->post['payment_passimpay_api_key']) === '') {
             $this->error['api_key'] = $this->language->get('error_api_key');
         }
-        if (empty($this->request->post['payment_passimpay_platform_id'])) {
+        if (!isset($this->request->post['payment_passimpay_platform_id']) || filter_var($this->request->post['payment_passimpay_platform_id'], FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]) === false) {
             $this->error['platform_id'] = $this->language->get('error_platform_id');
+        }
+        if (!isset($this->request->post['payment_passimpay_payment_type'])
+            || !in_array($this->request->post['payment_passimpay_payment_type'], ['0', '1', '2'], true)) {
+            $this->error['warning'] = $this->language->get('error_payment_type');
+        }
+        $allowed_statuses = array_map('intval', array_column($this->model_localisation_order_status->getOrderStatuses(), 'order_status_id'));
+        foreach (['success', 'pending', 'failed'] as $status) {
+            $value = $this->request->post['payment_passimpay_order_status_' . $status . '_id'] ?? null;
+            if ($status === 'pending' && ($value === null || $value === '' || $value === '0')) {
+                continue;
+            }
+            if (filter_var($value, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]) === false || !in_array((int)$value, $allowed_statuses, true)) {
+                $this->error['warning'] = $this->language->get('error_order_status');
+            }
         }
         return !$this->error;
     }

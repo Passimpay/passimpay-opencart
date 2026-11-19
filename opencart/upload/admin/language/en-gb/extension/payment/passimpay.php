@@ -39,3 +39,6 @@ $_['button_cancel']    = 'Cancel';
 $_['error_permission'] = 'Warning: You do not have permission to modify payment Passimpay!';
 $_['error_api_key']    = 'API Key required';
 $_['error_platform_id'] = 'Platform ID required';
+
+$_['error_payment_type'] = 'Choose a valid payment type.';
+$_['error_order_status'] = 'Choose successful and failed order statuses.';

@@ -39,3 +39,6 @@ $_['button_cancel']    = 'Отмена';
 $_['error_permission'] = 'Недостаточно прав для изменения модуля Passimpay.';
 $_['error_api_key']    = 'Укажите API ключ';
 $_['error_platform_id'] = 'Укажите Platform ID';
+
+$_['error_payment_type'] = 'Выберите допустимый способ оплаты.';
+$_['error_order_status'] = 'Выберите статусы успешной и неуспешной оплаты.';

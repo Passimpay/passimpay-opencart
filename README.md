@@ -1,8 +1,14 @@
-This **OpenCart** payment module is developed and powered by PassimPay.
+# PassimPay for OpenCart 3 / OpenCart 2.3
 
-If you have any questions or face difficulties in module operation, please, contact us:
+Payment modules using PassimPay API v2.
 
-* support@passimpay.io - PassimPay support service<br/>
-* ceo@passimpay.io - Assitance for Business 
+| Module | Version | Source directory | Download | Installation and update |
+| --- | --- | --- | --- | --- |
+| OpenCart 3 | 1.0.1 | `opencart` | [passimpay.ocmod.zip](https://cdn1.passimpay.io/upload/passimpay.ocmod.zip) | [Instructions](UPGRADE.md) |
+| OpenCart 2.3 | 2.3-p.8 | `opencart-2.3` | [passimpay-opencart-2.3.zip](https://cdn1.passimpay.io/upload/passimpay-opencart-2.3.zip) | [Instructions](opencart-2.3/UPGRADE.md) |
 
-Stay with PassimPay and grow your business!
+Use the module ZIP linked above for installation. The GitHub source ZIP contains the repository layout.
+
+Create a platform in your [PassimPay account](https://account.passimpay.io/) to obtain the Platform ID and API Key.
+
+[PassimPay support](https://passimpay.io/en/contacts)
